@@ -13,7 +13,7 @@
 - [ ] I followed [CONTRIBUTING.md](../CONTRIBUTING.md)
 - [ ] `name` in `SKILL.md` matches the skill folder name (if applicable)
 - [ ] Removed `metadata.internal` from any new installable skill
-- [ ] Ran `node scripts/validate-skills.mjs` locally
+- [ ] Ran `npm run validate` locally
 
 ## Test plan
 

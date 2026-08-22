@@ -39,7 +39,8 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 4. Validate locally:
 
    ```bash
-   node scripts/validate-skills.mjs
+   npm ci
+   npm run validate
    ```
 
 5. Commit, push, and open a PR. CI runs the same validation on pull requests and pushes to `main`.
@@ -54,7 +55,7 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 - Keep PRs focused: one skill or one related change set per PR when practical.
 - Use the PR template and describe what changed and how to verify it.
-- Ensure `node scripts/validate-skills.mjs` passes before requesting review.
+- Ensure `npm run validate` passes before requesting review.
 
 ## Reporting issues
 

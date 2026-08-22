@@ -53,7 +53,8 @@ For full contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 ## Validate
 
 ```bash
-node scripts/validate-skills.mjs
+npm ci
+npm run validate
 ```
 
 CI runs the same check on pull requests and pushes to `main`.

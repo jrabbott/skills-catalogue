@@ -1,0 +1,15 @@
+{
+  "name": "skills-catalogue",
+  "private": true,
+  "type": "module",
+  "description": "Private Agent Skills catalogue",
+  "scripts": {
+    "validate": "node scripts/validate-skills.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  }
+}

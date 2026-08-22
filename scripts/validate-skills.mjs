@@ -6,60 +6,44 @@
 import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { parse as parseYaml } from "yaml";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SKILLS_DIR = path.join(ROOT, "skills");
 const NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---(?=\r?\n|$)/;
+
+function extractFrontmatter(content, filePath) {
+  const match = FRONTMATTER_RE.exec(content);
+  if (!match) {
+    throw new Error(
+      `${filePath}: missing or malformed YAML frontmatter (expected opening and closing --- on their own lines)`,
+    );
+  }
+
+  return match[1];
+}
 
 function parseFrontmatter(content, filePath) {
-  if (!content.startsWith("---\n") && !content.startsWith("---\r\n")) {
-    throw new Error(`${filePath}: missing YAML frontmatter opening ---`);
+  const yamlText = extractFrontmatter(content, filePath);
+
+  let data;
+  try {
+    data = parseYaml(yamlText);
+  } catch (error) {
+    throw new Error(
+      `${filePath}: invalid YAML frontmatter: ${error.message ?? error}`,
+    );
   }
 
-  const end = content.indexOf("\n---", 4);
-  if (end === -1) {
-    throw new Error(`${filePath}: missing YAML frontmatter closing ---`);
+  if (data === null || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error(`${filePath}: frontmatter must be a YAML mapping`);
   }
 
-  const yaml = content.slice(4, end).replace(/\r\n/g, "\n");
-  const data = {};
-  let currentKey = null;
-  let indentBlock = null;
-
-  for (const line of yaml.split("\n")) {
-    if (indentBlock && /^\s+/.test(line) && line.trim()) {
-      // Skip nested block content (e.g. metadata:)
-      continue;
-    }
-    indentBlock = null;
-
-    const match = /^([A-Za-z0-9_-]+):\s*(.*)$/.exec(line);
-    if (!match) {
-      continue;
-    }
-
-    const [, key, raw] = match;
-    currentKey = key;
-    const value = raw.trim();
-
-    if (value === "" || value === "|" || value === ">") {
-      indentBlock = key;
-      data[key] = "";
-      continue;
-    }
-
-    data[key] = value.replace(/^["']|["']$/g, "");
-  }
-
-  void currentKey;
   return data;
 }
 
-async function walkSkillMarkdown(dir, depth = 0, acc = []) {
-  if (depth > 3) {
-    return acc;
-  }
-
+async function walkSkillMarkdown(dir, acc = []) {
   let entries;
   try {
     entries = await readdir(dir, { withFileTypes: true });
@@ -77,7 +61,7 @@ async function walkSkillMarkdown(dir, depth = 0, acc = []) {
 
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      await walkSkillMarkdown(full, depth + 1, acc);
+      await walkSkillMarkdown(full, acc);
       continue;
     }
 
@@ -89,16 +73,32 @@ async function walkSkillMarkdown(dir, depth = 0, acc = []) {
   return acc;
 }
 
+function isInternalSkill(frontmatter) {
+  const metadata = frontmatter.metadata;
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+    return false;
+  }
+
+  return metadata.internal === true || metadata.internal === "true";
+}
+
 function validateSkill(filePath, frontmatter) {
   const errors = [];
   const skillDir = path.dirname(filePath);
   const folderName = path.basename(skillDir);
 
-  const name = frontmatter.name?.trim();
-  const description = frontmatter.description?.trim();
+  if (isInternalSkill(frontmatter)) {
+    errors.push(
+      'remove metadata.internal from installable skills under skills/ (template-only marker)',
+    );
+  }
 
-  if (!name) {
+  const { name, description } = frontmatter;
+
+  if (name === undefined || name === null || name === "") {
     errors.push("missing required frontmatter field: name");
+  } else if (typeof name !== "string") {
+    errors.push(`name must be a string (got ${typeof name})`);
   } else {
     if (name.length > 64) {
       errors.push("name must be at most 64 characters");
@@ -113,8 +113,12 @@ function validateSkill(filePath, frontmatter) {
     }
   }
 
-  if (!description) {
+  if (description === undefined || description === null || description === "") {
     errors.push("missing required frontmatter field: description");
+  } else if (typeof description !== "string") {
+    errors.push(`description must be a string (got ${typeof description})`);
+  } else if (description.trim().length === 0) {
+    errors.push("description must be a non-empty string");
   } else if (description.length > 1024) {
     errors.push("description must be at most 1024 characters");
   }
