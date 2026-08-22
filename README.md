@@ -47,3 +47,21 @@ Optional skill contents (see the [Agent Skills specification](https://agentskill
 2. Edit `skills/<skill-name>/SKILL.md`: set `name` to `<skill-name>`, write a clear `description` (what it does and when to use it), remove `metadata.internal` (the template uses it so the placeholder is not installable), and fill in the instructions.
 
 3. Commit and push. Installers pick it up on the next `npx skills add`.
+
+For full contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Validate
+
+```bash
+npm ci
+npm run validate
+```
+
+CI runs the same check on pull requests and pushes to `main`.
+
+## Community
+
+- [Contributing](CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Security Policy](SECURITY.md)
+- [MIT License](LICENSE)
