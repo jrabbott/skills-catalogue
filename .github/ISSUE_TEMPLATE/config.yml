@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/jrabbott/skills-catalogue/security/advisories/new
+    about: Report a security vulnerability privately (do not open a public issue).
+  - name: Contributing guide
+    url: https://github.com/jrabbott/skills-catalogue/blob/main/CONTRIBUTING.md
+    about: How to add or update skills in this catalogue.

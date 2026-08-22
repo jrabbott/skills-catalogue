@@ -1,0 +1,51 @@
+name: Bug report
+description: Report a problem with a skill or with installing from this catalogue
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. For security issues, use [private vulnerability reporting](https://github.com/jrabbott/skills-catalogue/security/advisories/new) instead.
+  - type: input
+    id: skill
+    attributes:
+      label: Skill name
+      description: Folder name under `skills/`, or "catalogue / install" if not skill-specific
+      placeholder: e.g. code-review
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Clear description of the bug
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to reproduce the problem
+      placeholder: |
+        1. npx skills add jrabbott/skills-catalogue --skill ...
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Agent, OS, and Skills CLI version if known
+      placeholder: |
+        Agent: Cursor / Claude Code / Codex / ...
+        OS:
+        skills CLI:
+    validations:
+      required: false

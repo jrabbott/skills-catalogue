@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest a new skill or an improvement to an existing one
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Request type
+      options:
+        - New skill
+        - Improve existing skill
+        - Catalogue / tooling
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: skill
+    attributes:
+      label: Skill name
+      description: Existing skill folder, or proposed name for a new skill
+      placeholder: e.g. release-notes
+    validations:
+      required: false
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem does this solve? When would an agent use it?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Outline of the skill behavior or catalogue change
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
