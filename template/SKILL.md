@@ -1,6 +1,8 @@
 ---
 name: template-skill
 description: Replace with what this skill does and when to use it.
+metadata:
+  internal: true
 ---
 
 # Template Skill
