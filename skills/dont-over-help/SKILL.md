@@ -2,7 +2,7 @@
 name: dont-over-help
 description: Matches the amount of help to what the user asked for. Avoids extra rewrites, explanations, or summaries. Use as a core dependency for communication skills, or whenever the agent must stay within the requested scope.
 metadata:
-  category: communication
+  category: core
 ---
 
 # Don't Over-Help
