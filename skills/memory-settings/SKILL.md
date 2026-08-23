@@ -60,4 +60,5 @@ decision_records:
 - Do not overwrite an existing `.memory/settings.yml`.
 - Create the file only when the user accepts.
 - Resolve all configured paths relative to the workspace root.
+- Configured path values must be relative and must stay under the workspace root.
 - Keep instructions and messages in ASD-STE100 (Simplified Technical English).

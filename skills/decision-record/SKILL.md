@@ -30,7 +30,10 @@ Use this skill when the user needs to:
 2. If that skill stops because the user declines creation, stop this skill.
 3. Read `decision_records.directory` from `.memory/settings.yml`.
 4. Treat the directory as a path relative to the workspace root.
-5. Resolve the directory as `join(workspaceRoot, decision_records.directory)`.
+5. Reject the value if `path.isAbsolute(directory)`.
+6. Resolve the directory with `path.resolve(workspaceRoot, directory)`.
+7. Reject the value if the resolved path is not equal to `workspaceRoot` and does not start with `workspaceRoot + path.sep`.
+8. If the path fails these checks, stop. Tell the user that the path is invalid. Do not create directories or write files.
 
 ### 2. Gather context
 
@@ -67,5 +70,6 @@ Use this skill when the user needs to:
 
 - Always follow `memory-settings` before you write a decision record.
 - Always use `decision_records.directory` from `.memory/settings.yml`.
+- Reject absolute paths and paths that leave the workspace root.
 - Use kebab-case titles for file names.
 - Change only the `Status` field when you update an existing record.

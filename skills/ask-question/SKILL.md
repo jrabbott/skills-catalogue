@@ -28,7 +28,10 @@ Use this skill when the user asks about:
 2. If that skill stops because the user declines creation, stop this skill. Do not invent an answer.
 3. Read `documentation_folders` from `.memory/settings.yml`.
 4. Treat each entry in `documentation_folders` as a path relative to the workspace root.
-5. Resolve each folder as `join(workspaceRoot, folderPath)` before you search.
+5. For each entry, reject it if `path.isAbsolute(folderPath)`.
+6. Resolve each accepted entry with `path.resolve(workspaceRoot, folderPath)`.
+7. Reject the entry if the resolved path is not equal to `workspaceRoot` and does not start with `workspaceRoot + path.sep`.
+8. If any entry fails these checks, stop. Tell the user which path is invalid. Do not search.
 
 ### 2. Select the query method
 
@@ -109,5 +112,6 @@ Use this skill when the user asks about:
 - Always respect `documentation_folders` from `.memory/settings.yml`.
 - Stop when configuration is missing and the user declines creation.
 - Resolve `documentation_folders` paths relative to the workspace root.
+- Reject absolute paths and paths that leave the workspace root.
 - Stop when the filesystem MCP server is missing or not usable and the user chooses stop.
 - On the built-in fallback path, use the host's file-reading tool (`read`, `view`, or equivalent).
