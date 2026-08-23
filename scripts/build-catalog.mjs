@@ -122,7 +122,22 @@ async function main() {
     skills.push(entry);
   }
 
-  skills.sort((a, b) => a.name.localeCompare(b.name));
+  const byName = new Map();
+  for (const skill of skills) {
+    const existing = byName.get(skill.name);
+    if (existing) {
+      throw new Error(
+        `duplicate skill name "${skill.name}": ${existing.path} and ${skill.path}`,
+      );
+    }
+    byName.set(skill.name, skill);
+  }
+
+  skills.sort((a, b) => {
+    const byNameCmp = a.name.localeCompare(b.name, "en");
+    if (byNameCmp !== 0) return byNameCmp;
+    return a.path.localeCompare(b.path, "en");
+  });
 
   const catalog = {
     schemaVersion: 1,
