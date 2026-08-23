@@ -27,3 +27,9 @@ jobs:
 
       - name: Validate skills
         run: npm run validate
+
+      - name: Build catalogue
+        run: npm run build:catalog
+
+      - name: Check generated catalogue
+        run: git diff --exit-code -- catalog/skills.json
