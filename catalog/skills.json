@@ -1,4 +1,13 @@
 {
   "schemaVersion": 1,
-  "skills": []
+  "skills": [
+    {
+      "name": "ask-question",
+      "description": "Answers questions using only repository READMEs and configured documentation folders. Prefers the filesystem MCP server when available. Use when the user asks about project processes, local setup, assumptions, or existing documentation.",
+      "categories": [
+        "documentation"
+      ],
+      "path": "skills/ask-question"
+    }
+  ]
 }
