@@ -88,59 +88,136 @@ export function isInternalSkill(frontmatter) {
 }
 
 /**
- * Parse and validate the comma-separated `category` frontmatter field.
- * Returns `{ categories, errors }` where categories is sorted unique when valid.
+ * Parse a frontmatter field that is a single string or a YAML list of strings.
+ * Returns `{ values, errors }` (values unsorted; duplicates reported as errors).
  */
-export function parseCategories(frontmatter) {
+export function parseStringOrList(value, fieldName) {
   const errors = [];
-  const { category } = frontmatter;
 
-  if (category === undefined || category === null || category === "") {
-    errors.push("missing required frontmatter field: category");
-    return { categories: [], errors };
+  if (value === undefined || value === null || value === "") {
+    return { values: [], errors };
   }
 
-  if (typeof category !== "string") {
-    errors.push(`category must be a string (got ${typeof category})`);
-    return { categories: [], errors };
+  /** @type {unknown[]} */
+  let rawItems;
+  if (typeof value === "string") {
+    rawItems = [value];
+  } else if (Array.isArray(value)) {
+    rawItems = value;
+  } else {
+    errors.push(
+      `${fieldName} must be a string or a list of strings (got ${typeof value})`,
+    );
+    return { values: [], errors };
   }
 
-  const raw = category.trim();
-  if (raw.length === 0) {
-    errors.push("category must be a non-empty string");
-    return { categories: [], errors };
-  }
-
-  const parts = raw.split(",").map((part) => part.trim());
   const seen = new Set();
-  const categories = [];
+  const values = [];
 
-  for (const part of parts) {
-    if (part.length === 0) {
+  for (const item of rawItems) {
+    if (typeof item !== "string") {
       errors.push(
-        "category must be a comma-separated list of non-empty values",
+        `${fieldName} entries must be strings (got ${typeof item})`,
       );
       continue;
     }
 
+    const trimmed = item.trim();
+    if (trimmed.length === 0) {
+      errors.push(`${fieldName} must not contain empty values`);
+      continue;
+    }
+
+    if (seen.has(trimmed)) {
+      errors.push(`duplicate ${fieldName} entry "${trimmed}"`);
+      continue;
+    }
+
+    seen.add(trimmed);
+    values.push(trimmed);
+  }
+
+  return { values, errors };
+}
+
+/**
+ * Parse and validate the `category` frontmatter field (string or list).
+ * Returns `{ categories, errors }` where categories is sorted unique when valid.
+ */
+export function parseCategories(frontmatter) {
+  const { category } = frontmatter;
+
+  if (category === undefined || category === null || category === "") {
+    return {
+      categories: [],
+      errors: ["missing required frontmatter field: category"],
+    };
+  }
+
+  const { values, errors } = parseStringOrList(category, "category");
+  if (errors.length) {
+    return { categories: [], errors };
+  }
+
+  if (values.length === 0) {
+    return {
+      categories: [],
+      errors: ["category must include at least one label"],
+    };
+  }
+
+  const categories = [];
+  for (const part of values) {
     if (!CATEGORY_PATTERN.test(part)) {
       errors.push(
         `category "${part}" must be lowercase letters with single hyphens only (no digits, no leading/trailing/consecutive hyphens)`,
       );
       continue;
     }
-
-    if (seen.has(part)) {
-      errors.push(`duplicate category "${part}"`);
-      continue;
-    }
-
-    seen.add(part);
     categories.push(part);
+  }
+
+  if (errors.length) {
+    return { categories: [], errors };
   }
 
   categories.sort((a, b) => a.localeCompare(b, "en"));
   return { categories, errors };
+}
+
+/**
+ * Parse and validate the optional `dependency` frontmatter field (string or list).
+ * Returns `{ dependencies, errors }` where dependencies is sorted unique when valid.
+ */
+export function parseDependencies(frontmatter) {
+  const { dependency } = frontmatter;
+
+  if (dependency === undefined || dependency === null || dependency === "") {
+    return { dependencies: [], errors: [] };
+  }
+
+  const { values, errors } = parseStringOrList(dependency, "dependency");
+  if (errors.length) {
+    return { dependencies: [], errors };
+  }
+
+  const dependencies = [];
+  for (const part of values) {
+    if (!NAME_PATTERN.test(part)) {
+      errors.push(
+        `dependency "${part}" must be lowercase alphanumeric with single hyphens (no leading/trailing/consecutive hyphens)`,
+      );
+      continue;
+    }
+    dependencies.push(part);
+  }
+
+  if (errors.length) {
+    return { dependencies: [], errors };
+  }
+
+  dependencies.sort((a, b) => a.localeCompare(b, "en"));
+  return { dependencies, errors };
 }
 
 export function validateSkill(filePath, frontmatter) {
@@ -187,7 +264,97 @@ export function validateSkill(filePath, frontmatter) {
   const { errors: categoryErrors } = parseCategories(frontmatter);
   errors.push(...categoryErrors);
 
+  const { errors: dependencyErrors } = parseDependencies(frontmatter);
+  errors.push(...dependencyErrors);
+
   return errors;
+}
+
+/**
+ * Validate that every dependency names an existing skill and that the graph has no cycles.
+ * `skills` is an array of `{ name, dependencies }` (dependencies already parsed).
+ * Returns a list of error strings.
+ */
+export function validateDependencyGraph(skills) {
+  const errors = [];
+  const byName = new Map();
+
+  for (const skill of skills) {
+    byName.set(skill.name, skill);
+  }
+
+  for (const skill of skills) {
+    for (const dep of skill.dependencies) {
+      if (!byName.has(dep)) {
+        errors.push(
+          `skill "${skill.name}" dependency "${dep}" does not match an installable skill`,
+        );
+      }
+      if (dep === skill.name) {
+        errors.push(`skill "${skill.name}" must not depend on itself`);
+      }
+    }
+  }
+
+  /** @type {Map<string, "visiting" | "visited">} */
+  const state = new Map();
+
+  function visit(name, stack) {
+    const current = state.get(name);
+    if (current === "visited") {
+      return;
+    }
+    if (current === "visiting") {
+      const cycleStart = stack.indexOf(name);
+      const cycle =
+        cycleStart >= 0
+          ? [...stack.slice(cycleStart), name].join(" -> ")
+          : [...stack, name].join(" -> ");
+      errors.push(`dependency cycle detected: ${cycle}`);
+      return;
+    }
+
+    state.set(name, "visiting");
+    const skill = byName.get(name);
+    if (skill) {
+      for (const dep of skill.dependencies) {
+        if (byName.has(dep)) {
+          visit(dep, [...stack, name]);
+        }
+      }
+    }
+    state.set(name, "visited");
+  }
+
+  for (const skill of skills) {
+    if (!state.has(skill.name)) {
+      visit(skill.name, []);
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Return the transitive closure of dependency names for the given skill names.
+ * `dependencyMap` maps skill name -> direct dependency name array.
+ */
+export function expandDependencies(skillNames, dependencyMap) {
+  const result = new Set(skillNames);
+  const queue = [...skillNames];
+
+  while (queue.length > 0) {
+    const name = queue.shift();
+    const deps = dependencyMap.get(name) ?? [];
+    for (const dep of deps) {
+      if (!result.has(dep)) {
+        result.add(dep);
+        queue.push(dep);
+      }
+    }
+  }
+
+  return result;
 }
 
 export function toPosixPath(relativePath) {

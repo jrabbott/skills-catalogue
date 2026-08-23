@@ -1,7 +1,8 @@
 ---
 name: ask-question
 description: Answers questions using only repository READMEs and configured documentation folders. Prefers the filesystem MCP server when available. Use when the user asks about project processes, local setup, assumptions, or existing documentation.
-category: documentation
+category: general
+dependency: memory-settings
 ---
 
 # Ask Question
@@ -23,14 +24,14 @@ Use this skill when the user asks about:
 
 ### 1. Load the configuration file
 
-1. Look for `.ask-question.yaml` at the workspace root.
-2. If the file is missing, tell the user that the configuration file is missing.
-3. Ask the user if you must create the file with default settings.
-4. If the user accepts, run this skill's `scripts/create-config.mjs` from the workspace root (so `.ask-question.yaml` is created there). Example: `node <path-to-this-skill>/scripts/create-config.mjs`.
-5. If the user declines, stop. Do not invent an answer.
-6. Read `documentation_folders` from the configuration file.
-7. Treat each entry in `documentation_folders` as a path relative to the workspace root.
-8. Resolve each folder as `join(workspaceRoot, folderPath)` before you search.
+1. Follow the `memory-settings` skill so that `.memory/settings.yml` exists at the workspace root.
+2. If that skill stops because the user declines creation, stop this skill. Do not invent an answer.
+3. Read `documentation_folders` from `.memory/settings.yml`.
+4. Treat each entry in `documentation_folders` as a path relative to the workspace root.
+5. For each entry, reject it if `path.isAbsolute(folderPath)`.
+6. Resolve each accepted entry with `path.resolve(workspaceRoot, folderPath)`.
+7. Reject the entry if the resolved path is not equal to `workspaceRoot` and does not start with `workspaceRoot + path.sep`.
+8. If any entry fails these checks, stop. Tell the user which path is invalid. Do not search.
 
 ### 2. Select the query method
 
@@ -96,7 +97,7 @@ Use this skill when the user asks about:
 ## Example Workflow
 
 1. The user asks: "How do I set up the local development environment?"
-2. You load `.ask-question.yaml` and read `documentation_folders`.
+2. You follow `memory-settings` and read `documentation_folders` from `.memory/settings.yml`.
 3. You confirm that the filesystem MCP server is available and can access the workspace root and documentation folders.
 4. You search for `setup`, `install`, and `environment` in README files and in `docs/`.
 5. You find `docs/setup-guide.md` and `README.md`.
@@ -108,8 +109,9 @@ Use this skill when the user asks about:
 - Keep answers grounded in repository content.
 - Prefer the filesystem MCP server when it is available.
 - Always search README files.
-- Always respect `documentation_folders` from the configuration file.
+- Always respect `documentation_folders` from `.memory/settings.yml`.
 - Stop when configuration is missing and the user declines creation.
 - Resolve `documentation_folders` paths relative to the workspace root.
+- Reject absolute paths and paths that leave the workspace root.
 - Stop when the filesystem MCP server is missing or not usable and the user chooses stop.
 - On the built-in fallback path, use the host's file-reading tool (`read`, `view`, or equivalent).

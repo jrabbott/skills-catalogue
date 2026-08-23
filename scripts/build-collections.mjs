@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Build collections/*.json from skill category frontmatter under skills/.
+ * Collections include transitive skill dependencies.
  */
 import { mkdir, readdir, readFile, unlink, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -8,9 +9,12 @@ import {
   COLLECTIONS_DIR,
   ROOT,
   SKILLS_DIR,
+  expandDependencies,
   parseCategories,
+  parseDependencies,
   parseFrontmatter,
   toPosixPath,
+  validateDependencyGraph,
   validateSkill,
   walkSkillMarkdown,
 } from "./lib/skills.mjs";
@@ -19,6 +23,10 @@ async function main() {
   const files = await walkSkillMarkdown(SKILLS_DIR);
   /** @type {Map<string, string>} */
   const seenByName = new Map();
+  /** @type {Map<string, string[]>} */
+  const dependencyMap = new Map();
+  /** @type {{ name: string, dependencies: string[] }[]} */
+  const skillGraph = [];
   /** @type {Map<string, Set<string>>} */
   const byCategory = new Map();
 
@@ -35,6 +43,7 @@ async function main() {
     }
 
     const { categories } = parseCategories(frontmatter);
+    const { dependencies } = parseDependencies(frontmatter);
     const { name } = frontmatter;
     const skillPath = toPosixPath(path.relative(ROOT, path.dirname(file)));
     const existingPath = seenByName.get(name);
@@ -44,6 +53,8 @@ async function main() {
       );
     }
     seenByName.set(name, skillPath);
+    dependencyMap.set(name, dependencies);
+    skillGraph.push({ name, dependencies });
 
     for (const category of categories) {
       let skills = byCategory.get(category);
@@ -55,6 +66,13 @@ async function main() {
     }
   }
 
+  const graphErrors = validateDependencyGraph(skillGraph);
+  if (graphErrors.length) {
+    throw new Error(
+      `dependency validation failed:\n${graphErrors.map((e) => `  - ${e}`).join("\n")}`,
+    );
+  }
+
   await mkdir(COLLECTIONS_DIR, { recursive: true });
 
   const written = new Set();
@@ -63,9 +81,9 @@ async function main() {
   );
 
   for (const category of categories) {
-    const skills = [...byCategory.get(category)].sort((a, b) =>
-      a.localeCompare(b, "en"),
-    );
+    const members = [...byCategory.get(category)];
+    const withDeps = expandDependencies(members, dependencyMap);
+    const skills = [...withDeps].sort((a, b) => a.localeCompare(b, "en"));
     const collection = {
       name: category,
       skills,

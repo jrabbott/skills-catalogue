@@ -34,7 +34,17 @@ skills-catalogue/
 
 Each skill is a folder under `skills/` containing a `SKILL.md` with YAML frontmatter (`name`, `description`, `category`) and Markdown instructions. The `name` field must match the folder name.
 
-`category` is required: a comma-separated list of kebab-case labels (lowercase letters and single hyphens only; no digits). A skill may belong to multiple categories, for example `category: software-engineering, security`. Collections are generated from these labels so installers can pull a whole bundle.
+`category` is required: a single kebab-case label, or a YAML list of labels (lowercase letters and single hyphens only; no digits). A skill may belong to multiple categories:
+
+```yaml
+category: general
+# or
+category:
+  - engineering
+  - documentation
+```
+
+Optional `dependency` names other installable skills the same way (string or YAML list). Collections are generated from category labels and always include transitive dependencies, so installers pull a complete bundle.
 
 Optional skill contents (see the [Agent Skills specification](https://agentskills.io/specification)):
 
