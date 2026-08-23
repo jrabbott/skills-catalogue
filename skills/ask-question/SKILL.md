@@ -26,7 +26,7 @@ Use this skill when the user asks about:
 1. Look for `.ask-question.yaml` at the workspace root.
 2. If the file is missing, tell the user that the configuration file is missing.
 3. Ask the user if you must create the file with default settings.
-4. If the user accepts, run `node scripts/create-config.mjs` from this skill directory.
+4. If the user accepts, run this skill's `scripts/create-config.mjs` from the workspace root (so `.ask-question.yaml` is created there). Example: `node <path-to-this-skill>/scripts/create-config.mjs`.
 5. If the user declines, stop. Do not invent an answer.
 6. Read `documentation_folders` from the configuration file.
 
