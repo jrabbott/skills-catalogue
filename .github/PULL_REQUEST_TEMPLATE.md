@@ -16,7 +16,7 @@
 - [ ] `dependency` names existing skills when present (string or YAML list)
 - [ ] Removed `metadata.internal` from any new installable skill
 - [ ] Ran `npm run validate` locally
-- [ ] Ran `npm run build` and committed `catalog/skills.json` and `collections/` (if skills changed)
+- [ ] Ran `npm run build` and committed `catalogue/skills.json` and `collections/` (if skills changed)
 
 ## Test plan
 

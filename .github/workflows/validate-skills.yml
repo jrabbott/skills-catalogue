@@ -29,13 +29,13 @@ jobs:
         run: npm run validate
 
       - name: Build catalogue
-        run: npm run build:catalog
+        run: npm run build:catalogue
 
       - name: Check generated catalogue
         run: |
-          test -f catalog/skills.json
-          git ls-files --error-unmatch catalog/skills.json
-          git diff --exit-code -- catalog/skills.json
+          test -f catalogue/skills.json
+          git ls-files --error-unmatch catalogue/skills.json
+          git diff --exit-code -- catalogue/skills.json
 
       - name: Build collections
         run: npm run build:collections
