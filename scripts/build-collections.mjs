@@ -10,12 +10,15 @@ import {
   SKILLS_DIR,
   parseCategories,
   parseFrontmatter,
+  toPosixPath,
   validateSkill,
   walkSkillMarkdown,
 } from "./lib/skills.mjs";
 
 async function main() {
   const files = await walkSkillMarkdown(SKILLS_DIR);
+  /** @type {Map<string, string>} */
+  const seenByName = new Map();
   /** @type {Map<string, Set<string>>} */
   const byCategory = new Map();
 
@@ -33,6 +36,14 @@ async function main() {
 
     const { categories } = parseCategories(frontmatter);
     const { name } = frontmatter;
+    const skillPath = toPosixPath(path.relative(ROOT, path.dirname(file)));
+    const existingPath = seenByName.get(name);
+    if (existingPath) {
+      throw new Error(
+        `duplicate skill name "${name}": ${existingPath} and ${skillPath}`,
+      );
+    }
+    seenByName.set(name, skillPath);
 
     for (const category of categories) {
       let skills = byCategory.get(category);
