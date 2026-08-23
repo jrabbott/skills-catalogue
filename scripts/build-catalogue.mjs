@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Build catalog/skills.json from installable skills under skills/.
+ * Build catalogue/skills.json from installable skills under skills/.
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -14,8 +14,8 @@ import {
   walkSkillMarkdown,
 } from "./lib/skills.mjs";
 
-const CATALOG_DIR = path.join(ROOT, "catalog");
-const CATALOG_PATH = path.join(CATALOG_DIR, "skills.json");
+const CATALOGUE_DIR = path.join(ROOT, "catalogue");
+const CATALOGUE_PATH = path.join(CATALOGUE_DIR, "skills.json");
 
 async function main() {
   const files = await walkSkillMarkdown(SKILLS_DIR);
@@ -60,17 +60,17 @@ async function main() {
     return a.path.localeCompare(b.path, "en");
   });
 
-  const catalog = {
+  const catalogue = {
     schemaVersion: 1,
     skills,
   };
 
-  await mkdir(CATALOG_DIR, { recursive: true });
-  const json = `${JSON.stringify(catalog, null, 2)}\n`;
-  await writeFile(CATALOG_PATH, json, "utf8");
+  await mkdir(CATALOGUE_DIR, { recursive: true });
+  const json = `${JSON.stringify(catalogue, null, 2)}\n`;
+  await writeFile(CATALOGUE_PATH, json, "utf8");
 
   console.log(
-    `Wrote ${path.relative(ROOT, CATALOG_PATH)} (${skills.length} skill(s)).`,
+    `Wrote ${path.relative(ROOT, CATALOGUE_PATH)} (${skills.length} skill(s)).`,
   );
 }
 

@@ -26,7 +26,7 @@ skills-catalogue/
 ├── skills/             # Installable skills live here
 │   └── <skill-name>/
 │       └── SKILL.md
-├── catalog/
+├── catalogue/
 │   └── skills.json     # Generated catalogue index (commit after changes)
 └── collections/        # Generated category bundles (commit after changes)
     └── <category>.json
@@ -80,7 +80,7 @@ npm run validate
 npm run build
 ```
 
-CI runs the same checks on pull requests and pushes to `main`, and fails if `catalog/skills.json` or `collections/` are out of date.
+CI runs the same checks on pull requests and pushes to `main`, and fails if `catalogue/skills.json` or `collections/` are out of date.
 
 ## Community
 

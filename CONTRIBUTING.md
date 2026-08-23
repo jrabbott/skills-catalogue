@@ -44,7 +44,7 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
    npm run build
    ```
 
-   This runs `build:catalog` and `build:collections`.
+   This runs `build:catalogue` and `build:collections`.
 
 5. Validate locally:
 
@@ -53,7 +53,7 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
    npm run validate
    ```
 
-6. Commit the skill changes, `catalog/skills.json`, and any updates under `collections/`, push, and open a PR. CI runs the same validation and fails if the catalogue or collections are stale.
+6. Commit the skill changes, `catalogue/skills.json`, and any updates under `collections/`, push, and open a PR. CI runs the same validation and fails if the catalogue or collections are stale.
 
 ### Naming rules
 
@@ -90,7 +90,7 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 - Keep PRs focused: one skill or one related change set per PR when practical.
 - Use the PR template and describe what changed and how to verify it.
-- Ensure `npm run validate` and `npm run build` pass, and commit up-to-date `catalog/skills.json` and `collections/`, before requesting review.
+- Ensure `npm run validate` and `npm run build` pass, and commit up-to-date `catalogue/skills.json` and `collections/`, before requesting review.
 
 ## Reporting issues
 
