@@ -26,11 +26,15 @@ skills-catalogue/
 ├── skills/             # Installable skills live here
 │   └── <skill-name>/
 │       └── SKILL.md
-└── catalog/
-    └── skills.json     # Generated catalogue index (commit after changes)
+├── catalog/
+│   └── skills.json     # Generated catalogue index (commit after changes)
+└── collections/        # Generated category bundles (commit after changes)
+    └── <category>.json
 ```
 
-Each skill is a folder under `skills/` containing a `SKILL.md` with YAML frontmatter (`name`, `description`) and Markdown instructions. The `name` field must match the folder name.
+Each skill is a folder under `skills/` containing a `SKILL.md` with YAML frontmatter (`name`, `description`, `category`) and Markdown instructions. The `name` field must match the folder name.
+
+`category` is required: a comma-separated list of kebab-case labels (lowercase letters and single hyphens only; no digits). A skill may belong to multiple categories, for example `category: software-engineering, security`. Collections are generated from these labels so installers can pull a whole bundle.
 
 Optional skill contents (see the [Agent Skills specification](https://agentskills.io/specification)):
 
@@ -46,12 +50,12 @@ Optional skill contents (see the [Agent Skills specification](https://agentskill
    cp -R template skills/<skill-name>
    ```
 
-2. Edit `skills/<skill-name>/SKILL.md`: set `name` to `<skill-name>`, write a clear `description` (what it does and when to use it), remove `metadata.internal` (the template uses it so the placeholder is not installable), and fill in the instructions.
+2. Edit `skills/<skill-name>/SKILL.md`: set `name` to `<skill-name>`, write a clear `description` (what it does and when to use it), set `category`, remove `metadata.internal` (the template uses it so the placeholder is not installable), and fill in the instructions.
 
-3. Regenerate the catalogue index and commit both the skill and `catalog/skills.json`:
+3. Regenerate the catalogue and collections, then commit the skill plus generated files:
 
    ```bash
-   npm run build:catalog
+   npm run build
    ```
 
 4. Commit and push. Installers pick it up on the next `npx skills add`.
@@ -63,10 +67,10 @@ For full contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 ```bash
 npm ci
 npm run validate
-npm run build:catalog
+npm run build
 ```
 
-CI runs the same checks on pull requests and pushes to `main`, and fails if `catalog/skills.json` is out of date.
+CI runs the same checks on pull requests and pushes to `main`, and fails if `catalog/skills.json` or `collections/` are out of date.
 
 ## Community
 

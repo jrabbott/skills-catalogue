@@ -1,6 +1,7 @@
 ---
 name: template-skill
 description: Replace with what this skill does and when to use it.
+category: software-engineering
 metadata:
   internal: true
 ---

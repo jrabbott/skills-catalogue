@@ -11,8 +11,11 @@ export const ROOT = path.resolve(
   "../..",
 );
 export const SKILLS_DIR = path.join(ROOT, "skills");
+export const COLLECTIONS_DIR = path.join(ROOT, "collections");
 
 const NAME_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/** Lowercase letters and single hyphens only (no digits or other characters). */
+export const CATEGORY_PATTERN = /^[a-z]+(?:-[a-z]+)*$/;
 const FRONTMATTER_RE = /^---\r?\n([\s\S]*?)\r?\n---(?=\r?\n|$)/;
 
 function extractFrontmatter(content, filePath) {
@@ -84,6 +87,62 @@ export function isInternalSkill(frontmatter) {
   return metadata.internal === true || metadata.internal === "true";
 }
 
+/**
+ * Parse and validate the comma-separated `category` frontmatter field.
+ * Returns `{ categories, errors }` where categories is sorted unique when valid.
+ */
+export function parseCategories(frontmatter) {
+  const errors = [];
+  const { category } = frontmatter;
+
+  if (category === undefined || category === null || category === "") {
+    errors.push("missing required frontmatter field: category");
+    return { categories: [], errors };
+  }
+
+  if (typeof category !== "string") {
+    errors.push(`category must be a string (got ${typeof category})`);
+    return { categories: [], errors };
+  }
+
+  const raw = category.trim();
+  if (raw.length === 0) {
+    errors.push("category must be a non-empty string");
+    return { categories: [], errors };
+  }
+
+  const parts = raw.split(",").map((part) => part.trim());
+  const seen = new Set();
+  const categories = [];
+
+  for (const part of parts) {
+    if (part.length === 0) {
+      errors.push(
+        "category must be a comma-separated list of non-empty values",
+      );
+      continue;
+    }
+
+    if (!CATEGORY_PATTERN.test(part)) {
+      errors.push(
+        `category "${part}" must be lowercase letters with single hyphens only (no digits, no leading/trailing/consecutive hyphens)`,
+      );
+      continue;
+    }
+
+    if (seen.has(part)) {
+      errors.push(`duplicate category "${part}"`);
+      continue;
+    }
+
+    seen.add(part);
+    categories.push(part);
+  }
+
+  categories.sort((a, b) => a.localeCompare(b, "en"));
+  return { categories, errors };
+}
+
 export function validateSkill(filePath, frontmatter) {
   const errors = [];
   const skillDir = path.dirname(filePath);
@@ -124,6 +183,9 @@ export function validateSkill(filePath, frontmatter) {
   } else if (description.length > 1024) {
     errors.push("description must be at most 1024 characters");
   }
+
+  const { errors: categoryErrors } = parseCategories(frontmatter);
+  errors.push(...categoryErrors);
 
   return errors;
 }

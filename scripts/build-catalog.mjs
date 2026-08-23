@@ -7,6 +7,7 @@ import path from "node:path";
 import {
   ROOT,
   SKILLS_DIR,
+  parseCategories,
   parseFrontmatter,
   toPosixPath,
   validateSkill,
@@ -32,18 +33,14 @@ async function main() {
       );
     }
 
-    const { name, description, category } = frontmatter;
-    const entry = {
+    const { name, description } = frontmatter;
+    const { categories } = parseCategories(frontmatter);
+    skills.push({
       name,
       description,
-    };
-
-    if (typeof category === "string" && category.trim().length > 0) {
-      entry.category = category;
-    }
-
-    entry.path = toPosixPath(path.relative(ROOT, path.dirname(file)));
-    skills.push(entry);
+      categories,
+      path: toPosixPath(path.relative(ROOT, path.dirname(file))),
+    });
   }
 
   const byName = new Map();

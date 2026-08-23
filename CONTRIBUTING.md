@@ -28,6 +28,7 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 2. Edit `skills/<skill-name>/SKILL.md`:
    - Set `name` to match the folder name (`<skill-name>`).
    - Write a clear `description` covering what the skill does and when to use it.
+   - Set required `category` (comma-separated kebab-case labels; see below).
    - Remove `metadata.internal` (the template uses it so the placeholder is not installable).
    - Fill in agent instructions.
 
@@ -36,11 +37,13 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
    - `references/` — docs loaded on demand
    - `assets/` — templates and static resources
 
-4. Regenerate the catalogue index (required whenever skills are added, removed, or frontmatter changes):
+4. Regenerate the catalogue and collections (required whenever skills are added, removed, or frontmatter changes):
 
    ```bash
-   npm run build:catalog
+   npm run build
    ```
+
+   This runs `build:catalog` and `build:collections`.
 
 5. Validate locally:
 
@@ -49,7 +52,7 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
    npm run validate
    ```
 
-6. Commit the skill changes and `catalog/skills.json`, push, and open a PR. CI runs the same validation and fails if the catalogue is stale.
+6. Commit the skill changes, `catalog/skills.json`, and any updates under `collections/`, push, and open a PR. CI runs the same validation and fails if the catalogue or collections are stale.
 
 ### Naming rules
 
@@ -57,11 +60,19 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 - Use lowercase letters, numbers, and single hyphens only (for example `code-review`).
 - Do not start or end with a hyphen, and do not use consecutive hyphens.
 
+### Category rules
+
+- `category` is required on every installable skill.
+- Use a comma-separated list for multiple categories (for example `software-engineering, security`).
+- Each label must be lowercase letters with single hyphens only (for example `web-development`). Digits and other special characters are not allowed.
+- Do not start or end a label with a hyphen, and do not use consecutive hyphens.
+- Collections under `collections/<category>.json` are generated from these labels; do not edit them by hand.
+
 ## Pull requests
 
 - Keep PRs focused: one skill or one related change set per PR when practical.
 - Use the PR template and describe what changed and how to verify it.
-- Ensure `npm run validate` and `npm run build:catalog` pass, and commit an up-to-date `catalog/skills.json`, before requesting review.
+- Ensure `npm run validate` and `npm run build` pass, and commit up-to-date `catalog/skills.json` and `collections/`, before requesting review.
 
 ## Reporting issues
 
