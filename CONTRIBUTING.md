@@ -36,14 +36,20 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
    - `references/` — docs loaded on demand
    - `assets/` — templates and static resources
 
-4. Validate locally:
+4. Regenerate the catalogue index (required whenever skills are added, removed, or frontmatter changes):
+
+   ```bash
+   npm run build:catalog
+   ```
+
+5. Validate locally:
 
    ```bash
    npm ci
    npm run validate
    ```
 
-5. Commit, push, and open a PR. CI runs the same validation on pull requests and pushes to `main`.
+6. Commit the skill changes and `catalog/skills.json`, push, and open a PR. CI runs the same validation and fails if the catalogue is stale.
 
 ### Naming rules
 
@@ -55,7 +61,7 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 - Keep PRs focused: one skill or one related change set per PR when practical.
 - Use the PR template and describe what changed and how to verify it.
-- Ensure `npm run validate` passes before requesting review.
+- Ensure `npm run validate` and `npm run build:catalog` pass, and commit an up-to-date `catalog/skills.json`, before requesting review.
 
 ## Reporting issues
 

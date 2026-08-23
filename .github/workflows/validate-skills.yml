@@ -27,3 +27,12 @@ jobs:
 
       - name: Validate skills
         run: npm run validate
+
+      - name: Build catalogue
+        run: npm run build:catalog
+
+      - name: Check generated catalogue
+        run: |
+          test -f catalog/skills.json
+          git ls-files --error-unmatch catalog/skills.json
+          git diff --exit-code -- catalog/skills.json

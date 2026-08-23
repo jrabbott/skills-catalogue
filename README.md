@@ -23,9 +23,11 @@ This repository is private. The CLI uses your existing Git authentication (crede
 skills-catalogue/
 ├── template/           # Copy this when authoring a new skill
 │   └── SKILL.md
-└── skills/             # Installable skills live here
-    └── <skill-name>/
-        └── SKILL.md
+├── skills/             # Installable skills live here
+│   └── <skill-name>/
+│       └── SKILL.md
+└── catalog/
+    └── skills.json     # Generated catalogue index (commit after changes)
 ```
 
 Each skill is a folder under `skills/` containing a `SKILL.md` with YAML frontmatter (`name`, `description`) and Markdown instructions. The `name` field must match the folder name.
@@ -46,7 +48,13 @@ Optional skill contents (see the [Agent Skills specification](https://agentskill
 
 2. Edit `skills/<skill-name>/SKILL.md`: set `name` to `<skill-name>`, write a clear `description` (what it does and when to use it), remove `metadata.internal` (the template uses it so the placeholder is not installable), and fill in the instructions.
 
-3. Commit and push. Installers pick it up on the next `npx skills add`.
+3. Regenerate the catalogue index and commit both the skill and `catalog/skills.json`:
+
+   ```bash
+   npm run build:catalog
+   ```
+
+4. Commit and push. Installers pick it up on the next `npx skills add`.
 
 For full contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -55,9 +63,10 @@ For full contribution guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md).
 ```bash
 npm ci
 npm run validate
+npm run build:catalog
 ```
 
-CI runs the same check on pull requests and pushes to `main`.
+CI runs the same checks on pull requests and pushes to `main`, and fails if `catalog/skills.json` is out of date.
 
 ## Community
 
