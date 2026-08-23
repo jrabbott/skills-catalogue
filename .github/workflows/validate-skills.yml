@@ -43,4 +43,5 @@ jobs:
       - name: Check generated collections
         run: |
           test -d collections
+          test -z "$(git ls-files --others --exclude-standard -- collections/)"
           git diff --exit-code -- collections/
