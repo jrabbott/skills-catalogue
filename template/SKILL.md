@@ -1,7 +1,9 @@
 ---
 name: template-skill
 description: Replace with what this skill does and when to use it.
-category: software-engineering
+category: engineering
+# Optional: other skills this skill needs (string or YAML list)
+# dependency: memory-settings
 metadata:
   internal: true
 ---

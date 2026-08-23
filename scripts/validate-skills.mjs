@@ -8,7 +8,9 @@ import path from "node:path";
 import {
   ROOT,
   SKILLS_DIR,
+  parseDependencies,
   parseFrontmatter,
+  validateDependencyGraph,
   validateSkill,
   walkSkillMarkdown,
 } from "./lib/skills.mjs";
@@ -27,6 +29,9 @@ async function main() {
   }
 
   let failed = 0;
+  /** @type {{ name: string, dependencies: string[], relative: string }[]} */
+  const skillGraph = [];
+
   for (const file of files.sort()) {
     const relative = path.relative(ROOT, file);
     try {
@@ -41,6 +46,12 @@ async function main() {
         }
       } else {
         console.log(`OK   ${relative}`);
+        const { dependencies } = parseDependencies(frontmatter);
+        skillGraph.push({
+          name: frontmatter.name,
+          dependencies,
+          relative,
+        });
       }
     } catch (error) {
       failed += 1;
@@ -49,8 +60,19 @@ async function main() {
     }
   }
 
+  if (failed === 0 && skillGraph.length > 0) {
+    const graphErrors = validateDependencyGraph(skillGraph);
+    if (graphErrors.length) {
+      failed += 1;
+      console.error("FAIL dependency graph");
+      for (const error of graphErrors) {
+        console.error(`  - ${error}`);
+      }
+    }
+  }
+
   if (failed > 0) {
-    console.error(`\n${failed} skill(s) failed validation.`);
+    console.error(`\n${failed} check(s) failed validation.`);
     process.exit(1);
   }
 

@@ -1,0 +1,6 @@
+# Project memory settings (paths relative to workspace root)
+documentation_folders:
+  - docs
+
+decision_records:
+  directory: .memory/decisions
