@@ -1,10 +1,10 @@
 ---
 name: template-skill
 description: Replace with what this skill does and when to use it.
-category: engineering
-# Optional: other skills this skill needs (string or YAML list)
-# dependency: memory-settings
 metadata:
+  category: engineering
+  # Optional: other skills this skill needs (string or YAML list)
+  # depends-on: memory-settings
   internal: true
 ---
 

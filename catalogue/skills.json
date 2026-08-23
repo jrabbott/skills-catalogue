@@ -7,6 +7,9 @@
       "categories": [
         "general"
       ],
+      "dependsOn": [
+        "memory-settings"
+      ],
       "path": "skills/ask-question"
     },
     {
@@ -16,7 +19,41 @@
         "documentation",
         "engineering"
       ],
+      "dependsOn": [
+        "memory-settings"
+      ],
       "path": "skills/decision-record"
+    },
+    {
+      "name": "dont-over-help",
+      "description": "Matches the amount of help to what the user asked for. Avoids extra rewrites, explanations, or summaries. Use as a core dependency for communication skills, or whenever the agent must stay within the requested scope.",
+      "categories": [
+        "core"
+      ],
+      "dependsOn": [],
+      "path": "skills/dont-over-help"
+    },
+    {
+      "name": "dyslexia-friendly-formatting",
+      "description": "Formats information so it is easier to scan and process using short sections, headings, bullets, numbered steps, and clear emphasis. Requires the dont-over-help skill. Use when the user asks for dyslexia-friendly layout or easier scanning.",
+      "categories": [
+        "communication"
+      ],
+      "dependsOn": [
+        "dont-over-help"
+      ],
+      "path": "skills/dyslexia-friendly-formatting"
+    },
+    {
+      "name": "explain-simply",
+      "description": "Breaks down complex subjects, instructions, or terminology into simple explanations, key points, and examples. Requires the dont-over-help skill. Use when the user asks for a plain-language explanation of a complex topic.",
+      "categories": [
+        "communication"
+      ],
+      "dependsOn": [
+        "dont-over-help"
+      ],
+      "path": "skills/explain-simply"
     },
     {
       "name": "memory-settings",
@@ -24,7 +61,52 @@
       "categories": [
         "core"
       ],
+      "dependsOn": [],
       "path": "skills/memory-settings"
+    },
+    {
+      "name": "organise-messy-thoughts",
+      "description": "Turns rough notes, fragmented ideas, or unstructured thoughts into a clear logical structure. Requires the dont-over-help skill. Use when the user asks to organise notes, structure ideas, or clean up messy thinking.",
+      "categories": [
+        "communication"
+      ],
+      "dependsOn": [
+        "dont-over-help"
+      ],
+      "path": "skills/organise-messy-thoughts"
+    },
+    {
+      "name": "preserve-user-voice",
+      "description": "Improves someone's writing without making it sound unnaturally formal, academic, or unlike the original writer. Requires the dont-over-help skill. Use when the user wants edits that keep their natural voice and tone.",
+      "categories": [
+        "communication"
+      ],
+      "dependsOn": [
+        "dont-over-help"
+      ],
+      "path": "skills/preserve-user-voice"
+    },
+    {
+      "name": "simplify-text",
+      "description": "Rewrites dense or complex text in clear plain English while preserving the original meaning. Requires the dont-over-help skill. Use when the user asks to simplify wording, reduce complexity, or make text easier to read.",
+      "categories": [
+        "communication"
+      ],
+      "dependsOn": [
+        "dont-over-help"
+      ],
+      "path": "skills/simplify-text"
+    },
+    {
+      "name": "writing-support",
+      "description": "Helps users write emails, messages, documents, and other content by improving clarity, spelling, grammar, and flow without being critical. Requires the dont-over-help skill. Use when the user asks for writing help or gentle corrections.",
+      "categories": [
+        "communication"
+      ],
+      "dependsOn": [
+        "dont-over-help"
+      ],
+      "path": "skills/writing-support"
     }
   ]
 }

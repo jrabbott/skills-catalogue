@@ -141,36 +141,64 @@ export function parseStringOrList(value, fieldName) {
 }
 
 /**
- * Parse and validate the `category` frontmatter field (string or list).
+ * Return metadata mapping or null when missing/invalid.
+ */
+export function getMetadata(frontmatter) {
+  const metadata = frontmatter.metadata;
+  if (metadata === undefined || metadata === null) {
+    return null;
+  }
+  if (typeof metadata !== "object" || Array.isArray(metadata)) {
+    return null;
+  }
+  return metadata;
+}
+
+/**
+ * Parse and validate `metadata.category` (string or list).
  * Returns `{ categories, errors }` where categories is sorted unique when valid.
  */
 export function parseCategories(frontmatter) {
-  const { category } = frontmatter;
+  const errors = [];
 
-  if (category === undefined || category === null || category === "") {
-    return {
-      categories: [],
-      errors: ["missing required frontmatter field: category"],
-    };
+  if (Object.prototype.hasOwnProperty.call(frontmatter, "category")) {
+    errors.push(
+      "move top-level category to metadata.category (string or YAML list)",
+    );
   }
 
-  const { values, errors } = parseStringOrList(category, "category");
-  if (errors.length) {
+  const metadata = getMetadata(frontmatter);
+  if (frontmatter.metadata !== undefined && frontmatter.metadata !== null && metadata === null) {
+    errors.push("metadata must be a YAML mapping");
+    return { categories: [], errors };
+  }
+
+  const category = metadata?.category;
+
+  if (category === undefined || category === null || category === "") {
+    errors.push("missing required frontmatter field: metadata.category");
+    return { categories: [], errors };
+  }
+
+  const { values, errors: listErrors } = parseStringOrList(
+    category,
+    "metadata.category",
+  );
+  errors.push(...listErrors);
+  if (listErrors.length) {
     return { categories: [], errors };
   }
 
   if (values.length === 0) {
-    return {
-      categories: [],
-      errors: ["category must include at least one label"],
-    };
+    errors.push("metadata.category must include at least one label");
+    return { categories: [], errors };
   }
 
   const categories = [];
   for (const part of values) {
     if (!CATEGORY_PATTERN.test(part)) {
       errors.push(
-        `category "${part}" must be lowercase letters with single hyphens only (no digits, no leading/trailing/consecutive hyphens)`,
+        `metadata.category "${part}" must be lowercase letters with single hyphens only (no digits, no leading/trailing/consecutive hyphens)`,
       );
       continue;
     }
@@ -186,18 +214,36 @@ export function parseCategories(frontmatter) {
 }
 
 /**
- * Parse and validate the optional `dependency` frontmatter field (string or list).
+ * Parse and validate optional `metadata.depends-on` (string or list).
  * Returns `{ dependencies, errors }` where dependencies is sorted unique when valid.
  */
 export function parseDependencies(frontmatter) {
-  const { dependency } = frontmatter;
+  const errors = [];
 
-  if (dependency === undefined || dependency === null || dependency === "") {
-    return { dependencies: [], errors: [] };
+  if (Object.prototype.hasOwnProperty.call(frontmatter, "dependency")) {
+    errors.push(
+      "move top-level dependency to metadata.depends-on (string or YAML list)",
+    );
   }
 
-  const { values, errors } = parseStringOrList(dependency, "dependency");
-  if (errors.length) {
+  const metadata = getMetadata(frontmatter);
+  if (frontmatter.metadata !== undefined && frontmatter.metadata !== null && metadata === null) {
+    errors.push("metadata must be a YAML mapping");
+    return { dependencies: [], errors };
+  }
+
+  const dependsOn = metadata?.["depends-on"];
+
+  if (dependsOn === undefined || dependsOn === null || dependsOn === "") {
+    return { dependencies: [], errors };
+  }
+
+  const { values, errors: listErrors } = parseStringOrList(
+    dependsOn,
+    "metadata.depends-on",
+  );
+  errors.push(...listErrors);
+  if (listErrors.length) {
     return { dependencies: [], errors };
   }
 
@@ -205,7 +251,7 @@ export function parseDependencies(frontmatter) {
   for (const part of values) {
     if (!NAME_PATTERN.test(part)) {
       errors.push(
-        `dependency "${part}" must be lowercase alphanumeric with single hyphens (no leading/trailing/consecutive hyphens)`,
+        `metadata.depends-on "${part}" must be lowercase alphanumeric with single hyphens (no leading/trailing/consecutive hyphens)`,
       );
       continue;
     }
@@ -270,8 +316,9 @@ export function validateSkill(filePath, frontmatter) {
   return errors;
 }
 
+
 /**
- * Validate that every dependency names an existing skill and that the graph has no cycles.
+ * Validate that every depends-on names an existing skill and that the graph has no cycles.
  * `skills` is an array of `{ name, dependencies }` (dependencies already parsed).
  * Returns a list of error strings.
  */
@@ -287,7 +334,7 @@ export function validateDependencyGraph(skills) {
     for (const dep of skill.dependencies) {
       if (!byName.has(dep)) {
         errors.push(
-          `skill "${skill.name}" dependency "${dep}" does not match an installable skill`,
+          `skill "${skill.name}" depends-on "${dep}" does not match an installable skill`,
         );
       }
       if (dep === skill.name) {
@@ -310,7 +357,7 @@ export function validateDependencyGraph(skills) {
         cycleStart >= 0
           ? [...stack.slice(cycleStart), name].join(" -> ")
           : [...stack, name].join(" -> ");
-      errors.push(`dependency cycle detected: ${cycle}`);
+      errors.push(`depends-on cycle detected: ${cycle}`);
       return;
     }
 
@@ -336,8 +383,8 @@ export function validateDependencyGraph(skills) {
 }
 
 /**
- * Return the transitive closure of dependency names for the given skill names.
- * `dependencyMap` maps skill name -> direct dependency name array.
+ * Return the transitive closure of depends-on names for the given skill names.
+ * `dependencyMap` maps skill name -> direct depends-on name array.
  */
 export function expandDependencies(skillNames, dependencyMap) {
   const result = new Set(skillNames);

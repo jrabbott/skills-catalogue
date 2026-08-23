@@ -69,7 +69,7 @@ async function main() {
   const graphErrors = validateDependencyGraph(skillGraph);
   if (graphErrors.length) {
     throw new Error(
-      `dependency validation failed:\n${graphErrors.map((e) => `  - ${e}`).join("\n")}`,
+      `depends-on validation failed:\n${graphErrors.map((e) => `  - ${e}`).join("\n")}`,
     );
   }
 

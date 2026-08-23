@@ -1,10 +1,11 @@
 ---
 name: decision-record
 description: Helps create and update project decision records in the configured decisions directory. Use when the user needs to record a project decision, options considered, or the chosen solution.
-category:
-  - engineering
-  - documentation
-dependency: memory-settings
+metadata:
+  category:
+    - engineering
+    - documentation
+  depends-on: memory-settings
 ---
 
 # Decision Record
