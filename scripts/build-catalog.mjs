@@ -7,7 +7,6 @@ import path from "node:path";
 import {
   ROOT,
   SKILLS_DIR,
-  isInternalSkill,
   parseFrontmatter,
   toPosixPath,
   validateSkill,
@@ -25,10 +24,6 @@ async function main() {
     const relative = path.relative(ROOT, file);
     const content = await readFile(file, "utf8");
     const frontmatter = parseFrontmatter(content, relative);
-
-    if (isInternalSkill(frontmatter)) {
-      continue;
-    }
 
     const errors = validateSkill(file, frontmatter);
     if (errors.length) {
