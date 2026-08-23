@@ -28,8 +28,8 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 2. Edit `skills/<skill-name>/SKILL.md`:
    - Set `name` to match the folder name (`<skill-name>`).
    - Write a clear `description` covering what the skill does and when to use it.
-   - Set required `category` (string or YAML list of kebab-case labels; see below).
-   - Optionally set `dependency` (string or YAML list of skill names this skill needs).
+   - Set required `metadata.category` (string or YAML list of kebab-case labels; see below).
+   - Optionally set `metadata.depends-on` (string or YAML list of skill names this skill needs).
    - Remove `metadata.internal` (the template uses it so the placeholder is not installable).
    - Fill in agent instructions.
 
@@ -63,28 +63,30 @@ Please read and follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ### Category rules
 
-- `category` is required on every installable skill.
+- `metadata.category` is required on every installable skill.
 - Use a single string, or a YAML list for multiple categories:
 
   ```yaml
-  category: general
-  # or
-  category:
-    - engineering
-    - documentation
+  metadata:
+    category: general
+    # or
+    category:
+      - engineering
+      - documentation
   ```
 
 - Each label must be lowercase letters with single hyphens only (for example `web-development`). Digits and other special characters are not allowed.
 - Do not start or end a label with a hyphen, and do not use consecutive hyphens.
 - Collections under `collections/<category>.json` are generated from these labels; do not edit them by hand.
 
-### Dependency rules
+### Depends-on rules
 
-- `dependency` is optional.
+- `metadata.depends-on` is optional.
 - Use a single skill name string, or a YAML list of skill names.
-- Each dependency must match an installable skill under `skills/`.
-- Dependency cycles are not allowed.
+- Each depends-on entry must match an installable skill under `skills/`.
+- Depends-on cycles are not allowed.
 - Generated collections include transitive dependencies of every member skill.
+- Do not use top-level `category` or `dependency`; those fields are rejected.
 
 ## Pull requests
 

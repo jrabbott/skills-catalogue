@@ -79,7 +79,7 @@ async function main() {
     const graphErrors = validateDependencyGraph(skillGraph);
     if (graphErrors.length) {
       failed += 1;
-      console.error("FAIL dependency graph");
+      console.error("FAIL depends-on graph");
       for (const error of graphErrors) {
         console.error(`  - ${error}`);
       }

@@ -1,7 +1,8 @@
 ---
 name: memory-settings
 description: Checks for and creates the shared project memory configuration at .memory/settings.yml. Use when another skill needs this file, or when the user asks to set up memory settings.
-category: core
+metadata:
+  category: core
 ---
 
 # Memory Settings

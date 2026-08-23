@@ -1,8 +1,9 @@
 ---
 name: ask-question
 description: Answers questions using only repository READMEs and configured documentation folders. Prefers the filesystem MCP server when available. Use when the user asks about project processes, local setup, assumptions, or existing documentation.
-category: general
-dependency: memory-settings
+metadata:
+  category: general
+  depends-on: memory-settings
 ---
 
 # Ask Question

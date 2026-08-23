@@ -8,6 +8,7 @@ import {
   ROOT,
   SKILLS_DIR,
   parseCategories,
+  parseDependencies,
   parseFrontmatter,
   toPosixPath,
   validateSkill,
@@ -35,10 +36,12 @@ async function main() {
 
     const { name, description } = frontmatter;
     const { categories } = parseCategories(frontmatter);
+    const { dependencies } = parseDependencies(frontmatter);
     skills.push({
       name,
       description,
       categories,
+      dependsOn: dependencies,
       path: toPosixPath(path.relative(ROOT, path.dirname(file))),
     });
   }
