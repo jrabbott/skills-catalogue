@@ -10,9 +10,9 @@ The filesystem MCP server lets the agent search and read project documentation i
 
 1. Open the MCP configuration file for your agent host.
 2. Add a server entry for the filesystem package.
-3. Set the allowed directory to your project root.
+3. Set the allowed directory to your project root. The allowed directory must include the workspace root so README and documentation folder reads succeed.
 4. Restart the agent host or reload MCP servers.
-5. Confirm that the `list_allowed_directories` tool is available.
+5. Confirm that the `list_allowed_directories` tool is available and lists your project root.
 
 ## NPX example
 
