@@ -5,7 +5,9 @@
   "description": "Private Agent Skills catalogue",
   "scripts": {
     "validate": "node scripts/validate-skills.mjs",
-    "build:catalog": "node scripts/build-catalog.mjs"
+    "build:catalog": "node scripts/build-catalog.mjs",
+    "build:collections": "node scripts/build-collections.mjs",
+    "build": "npm run build:catalog && npm run build:collections"
   },
   "engines": {
     "node": ">=20"

@@ -36,3 +36,11 @@ jobs:
           test -f catalog/skills.json
           git ls-files --error-unmatch catalog/skills.json
           git diff --exit-code -- catalog/skills.json
+
+      - name: Build collections
+        run: npm run build:collections
+
+      - name: Check generated collections
+        run: |
+          test -d collections
+          git diff --exit-code -- collections/
