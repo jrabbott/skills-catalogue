@@ -4,7 +4,13 @@
  * Does not overwrite an existing configuration file.
  */
 
-import { constants, copyFileSync, existsSync, mkdirSync } from "node:fs";
+import {
+  constants,
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  statSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -26,7 +32,24 @@ if (!existsSync(defaultTemplate)) {
   process.exit(1);
 }
 
-mkdirSync(memoryDir, { recursive: true });
+try {
+  if (existsSync(memoryDir)) {
+    if (!statSync(memoryDir).isDirectory()) {
+      console.error(
+        `.memory exists but is not a directory: ${memoryDir}`,
+      );
+      process.exit(1);
+    }
+  } else {
+    mkdirSync(memoryDir, { recursive: true });
+  }
+} catch (error) {
+  console.error(
+    `Could not create or access .memory directory: ${memoryDir}`,
+  );
+  console.error(error.message ?? error);
+  process.exit(1);
+}
 
 try {
   copyFileSync(defaultTemplate, configPath, constants.COPYFILE_EXCL);
