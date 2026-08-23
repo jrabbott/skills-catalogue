@@ -61,7 +61,7 @@ Use this skill when the user asks about:
 2. Point the user to `references/mcp-filesystem-setup.md` for setup steps.
 3. Ask the user to choose one option:
    - **Stop** — End this skill. Do not answer from guesswork.
-   - **Continue** — Use built-in file tools (`glob`, `grep`, `read`) on README files and configured documentation folders.
+   - **Continue** — Use the host's built-in file tools for discovery and reading (`glob`, `grep`, and a file-reading tool such as `read` or `view`) on README files and configured documentation folders.
 4. Do not use the built-in method until the user chooses **Continue**.
 5. If the user chooses **Stop**, end this skill.
 
@@ -112,3 +112,4 @@ Use this skill when the user asks about:
 - Stop when configuration is missing and the user declines creation.
 - Resolve `documentation_folders` paths relative to the workspace root.
 - Stop when the filesystem MCP server is missing or not usable and the user chooses stop.
+- On the built-in fallback path, use the host's file-reading tool (`read`, `view`, or equivalent).
